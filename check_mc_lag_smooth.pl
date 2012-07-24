@@ -106,10 +106,10 @@ if ($rcon->connect){
 	$p->add_perfdata( label => "tickrate", value => $tps );
 	$p->nagios_exit(
 		return_code => $p->check_threshold(check => $tps, warning => $p->opts->warning, critical => $p->opts->critical), 
-		message => " Rate: $tps TPS ",
+		message => "Rate: $tps TPS",
 	);
 }	
 else {
 	$rcon->disconnect();
-	$p->nagios_die( " check failed " );
+	$p->nagios_die( "check failed" );
 }
