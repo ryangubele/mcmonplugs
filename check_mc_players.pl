@@ -18,10 +18,8 @@ my $p = Nagios::Plugin->new(
     ",
     version => $VERSION,
     blurb => 'This plugin uses the Minecraft RCON protocol to connect to a remote
-Bukkit/Minecraft server, run the \'/lag\' command, parses the result, and
-returns the server\'s TPS (ticks/s) rate for monitoring with Nagios.  This
-plugin assumes that \'/lag\' is provided by the LagMeter plugin, available
-at http://dev.bukkit.org/server-mods/lagmeter/', 
+Bukkit/Minecraft server, run the \'/list\' command, parses the result, and
+returns the number of players for monitoring with Nagios.',
 
 	extra => "
 
@@ -36,9 +34,9 @@ carefully, and pay particular attention to Table 3: Example Ranges.
 
   Threshold example:
 
-  Warn when tickrate <20 and critical when tickrate <19:
+  Warn when playercount >18 and critical when playercount >19:
 
-  $PROGNAME -w :20 -c :19
+  $PROGNAME -w :18 -c :19
   "
 );
 
@@ -46,21 +44,21 @@ $p->add_arg(
 	spec => 'warning|w=s',
 	help => 
 qq{-w, --warning=MIN:MAX
-   Minimum and maximum tickrate, outside of which a
-   warning will be generated.  If omitted, tickrates less than 20
+   Minimum and maximum playercount, outside of which a
+   warning will be generated.  If omitted, playercounts greater than 18
    will generate a warning.},
 
-	default => '20:',
+	default => ':18',
 );
 
 $p->add_arg(
 	spec => 'critical|c=s',
 	help => 
 qq{-c, --critical=MIN:MAX
-   Minimum and maximum tickrate, outside of which a
-   critical will be generated.  If omitted, tickrates less than 19
+   Minimum and maximum playercount, outside of which a
+   critical will be generated.  If omitted, playercounts greater than 19
    will generate a critical.},
-	default => '19:',
+	default => ':19',
 );
 
 $p->add_arg(
@@ -99,18 +97,18 @@ my $rcon = Minecraft::RCON->new(
 	}
 	);
 if ($rcon->connect){
-	my $response = $rcon->command('lag');
-	my $tps = ($response =~ /(\d{1,2}\.\d+) TPS/)[0];
+	my $response = $rcon->command('list');
+	my ($players, $max) = ($response =~ /There are (\d+) out of maximum (\d+) players online\./);
+	$p->add_perfdata( label => "players", value => $players, threshold => $p->threshold);
 	sleep 2; # Avoids a bug (race?) in MC-1.2.5/Bukkit-R4.0 that crashes servers.
-	$rcon->disconnect();
-	$p->add_perfdata( label => "tickrate", value => $tps );
+	$rcon->disconnect;
 	$p->nagios_exit(
-		return_code => $p->check_threshold(check => $tps, warning => $p->opts->warning, critical => $p->opts->critical), 
-		message => "Rate: $tps TPS",
+		return_code => $p->check_threshold(check => $players, warning => $p->opts->warning, critical => $p->opts->critical), 
+		message => "Players: $players\/$max",
 	);
 }	
 else {
-	sleep 2; # Avoids a bug (race?) in MC-1.2.5/Bukkit-R4.0 that crashes servers.
-	$rcon->disconnect();
+	sleep 2;
+	$rcon->disconnect; # Avoids a bug (race?) in MC-1.2.5/Bukkit-R4.0 that crashes servers.
 	$p->nagios_die( "check failed" );
 }
