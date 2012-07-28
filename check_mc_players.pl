@@ -98,10 +98,20 @@ my $rcon = Minecraft::RCON->new(
 	);
 if ($rcon->connect){
 	my $response = $rcon->command('list');
-	my ($players, $max) = ($response =~ /There are (\d+) out of maximum (\d+) players online\./);
-	$p->add_perfdata( label => "players", value => $players, threshold => $p->threshold);
 	sleep 2; # Avoids a bug (race?) in MC-1.2.5/Bukkit-R4.0 that crashes servers.
 	$rcon->disconnect;
+        if ($response =~ /\//) {
+                ($players, $hidden, $max) = ($response =~ /There are (\d+)\/(\d+) out of maximum (\d+) players online\./);
+        } else {
+                ($players, $max) = ($response =~ /There are (\d+) out of maximum (\d+) players online\./);
+        }
+        unless ($players =~ /\d+/) {
+                $p->nagios_die ("something went wrongly: $response, $players, $max");
+        }
+	
+	$p->add_perfdata( label => "players", value => $players );
+	$p->add_perfdata( label => "hidden", value => $hidden );
+
 	$p->nagios_exit(
 		return_code => $p->check_threshold(check => $players, warning => $p->opts->warning, critical => $p->opts->critical), 
 		message => "Players: $players\/$max",
