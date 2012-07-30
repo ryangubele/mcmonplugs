@@ -104,7 +104,7 @@ if ($rcon->connect){
 	$rcon->disconnect;
         if ($response =~ /\//) {
                 ($players, $hidden, $max) = ($response =~ /There are (\d+)\/(\d+) out of maximum (\d+) players online\./);
-	$players += $hidden;
+		$players += $hidden;
         } else {
                 ($players, $max) = ($response =~ /There are (\d+) out of maximum (\d+) players online\./);
         }
