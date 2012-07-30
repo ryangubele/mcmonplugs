@@ -97,11 +97,14 @@ my $rcon = Minecraft::RCON->new(
 	}
 	);
 if ($rcon->connect){
+	my ($players, $max);
+	my $hidden = 0;
 	my $response = $rcon->command('list');
 	sleep 2; # Avoids a bug (race?) in MC-1.2.5/Bukkit-R4.0 that crashes servers.
 	$rcon->disconnect;
         if ($response =~ /\//) {
                 ($players, $hidden, $max) = ($response =~ /There are (\d+)\/(\d+) out of maximum (\d+) players online\./);
+	$players += $hidden;
         } else {
                 ($players, $max) = ($response =~ /There are (\d+) out of maximum (\d+) players online\./);
         }
