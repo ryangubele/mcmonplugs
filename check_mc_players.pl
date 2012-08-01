@@ -117,7 +117,7 @@ if ($rcon->connect){
 
 	$p->nagios_exit(
 		return_code => $p->check_threshold(check => $players, warning => $p->opts->warning, critical => $p->opts->critical), 
-		message => "Players: $players\/$max",
+		message => "Players: $players\/$max Hidden: $hidden/$max",
 	);
 }	
 else {
