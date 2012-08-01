@@ -108,9 +108,6 @@ if ($rcon->connect){
         } else {
                 ($players, $max) = ($response =~ /There are (\d+) out of maximum (\d+) players online\./);
         }
-        unless ($players =~ /\d+/) {
-                $p->nagios_die ("something went wrongly: $response, $players, $max");
-        }
 	
 	$p->add_perfdata( label => "players", value => $players );
 	$p->add_perfdata( label => "hidden", value => $hidden );
