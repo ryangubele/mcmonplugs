@@ -19,7 +19,16 @@ my $p = Nagios::Plugin->new(
     version => $VERSION,
     blurb => 'This plugin uses the Minecraft RCON protocol to connect to a remote
 Bukkit/Minecraft server, run the \'/list\' command, parses the result, and
-returns the number of players for monitoring with Nagios.',
+returns the number of players for monitoring with Nagios. This plugin assumes that
+\'/list\' is provided by the Essentials plugin, located at:
+
+http://dev.bukkit.org/server-mods/essentials/
+
+For hidden player functionality, this plugin assumes that you are using
+VanishNoPacket with the Essentials hooks enabled, located here:
+
+http://dev.bukkit.org/server-mods/vanish/
+',
 
 	extra => "
 
