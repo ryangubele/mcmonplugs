@@ -101,7 +101,6 @@ my $rcon = Minecraft::RCON->new(
 if ($rcon->connect){
 	my $response = $rcon->command('lag');
 	my $tps = ($response =~ /(\d{1,2}\.\d+) TPS/)[0];
-	sleep 2; # Avoids a bug (race?) in MC-1.2.5/Bukkit-R4.0 that crashes servers.
 	$rcon->disconnect();
 	$p->add_perfdata( label => "tickrate", value => $tps );
 	$p->nagios_exit(
@@ -110,7 +109,6 @@ if ($rcon->connect){
 	);
 }	
 else {
-	sleep 2; # Avoids a bug (race?) in MC-1.2.5/Bukkit-R4.0 that crashes servers.
 	$rcon->disconnect();
 	$p->nagios_die( "check failed" );
 }
