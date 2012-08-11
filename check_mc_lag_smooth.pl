@@ -38,7 +38,7 @@ carefully, and pay particular attention to Table 3: Example Ranges.
 
   Warn when tickrate <20 and critical when tickrate <19:
 
-  $PROGNAME -w :20 -c :19
+  $PROGNAME -w 20: -c 19:
   "
 );
 
